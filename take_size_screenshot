@@ -1,0 +1,135 @@
+#!/bin/bash
+
+get_pretty_name() {
+    local class="$1"
+    local pretty=""
+
+    [[ -z "$class" ]] && { echo "unknown"; return 1; }
+
+    local user_map="$HOME/.config/screenshot_class_map.txt"
+    if [[ -f "$user_map" ]]; then
+        # Format: class=PrettyName
+        pretty=$(grep "^$class=" "$user_map" | cut -d'=' -f2-)
+        if [[ -n "$pretty" ]]; then
+            echo "$pretty"
+            return 0
+        fi
+    fi
+
+    local desktop_dirs=(
+        "/usr/share/applications"
+        "/usr/local/share/applications"
+        "$HOME/.local/share/applications"
+    )
+
+    local possible_names=()
+    possible_names+=("$class.desktop")
+    local last_part="${class##*.}"
+    possible_names+=("$last_part.desktop")
+    possible_names+=("$class")
+
+    local desktop_file=""
+    for dir in "${desktop_dirs[@]}"; do
+        [[ -d "$dir" ]] || continue
+        for name in "${possible_names[@]}"; do
+            local candidate="$dir/$name"
+            if [[ -f "$candidate" ]]; then
+                desktop_file="$candidate"
+                break 2
+            fi
+        done
+    done
+
+    if [[ -n "$desktop_file" ]]; then
+        local lang="${LANG%%.*}"
+        pretty=$(grep -m1 "^Name\[$lang\]=" "$desktop_file" | cut -d'=' -f2-)
+        if [[ -z "$pretty" ]]; then
+            pretty=$(grep -m1 "^Name=" "$desktop_file" | cut -d'=' -f2-)
+        fi
+        if [[ -z "$pretty" ]]; then
+            pretty=$(grep -m1 "^GenericName\[$lang\]=" "$desktop_file" | cut -d'=' -f2-)
+        fi
+        if [[ -z "$pretty" ]]; then
+            pretty=$(grep -m1 "^GenericName=" "$desktop_file" | cut -d'=' -f2-)
+        fi
+        if [[ -n "$pretty" ]]; then
+            echo "$pretty"
+            return 0
+        fi
+    fi
+
+    pretty="${class##*.}"
+    pretty="${pretty//_/ }"
+    pretty="$(tr '[:lower:]' '[:upper:]' <<< "${pretty:0:1}")${pretty:1}"
+    echo "$pretty"
+}
+
+
+geometry="$1"
+
+if [ -z "$geometry" ]; then
+    exit 0
+fi
+# Default screenshot directory
+MASSIVE_PATH="$HOME/Pictures/Screenshots/Massive"
+SCREENSHOT_PATH="$HOME/Pictures/Screenshots"
+
+echo "slurp stdout = $geometry"
+
+slurp_x=$(echo $geometry | cut -d' ' -f1 | cut -d',' -f1)
+slurp_y=$(echo $geometry | cut -d' ' -f1 | cut -d',' -f2)
+slurp_w=$(echo $geometry | cut -d' ' -f2 | cut -d'x' -f1)
+slurp_h=$(echo $geometry | cut -d' ' -f2 | cut -d'x' -f2)
+
+window_x=$((slurp_x + slurp_w / 2))
+window_y=$((slurp_y + slurp_h / 2))
+
+
+# Everything about window under start
+WINDOW_INFO=$($HOME/.local/scripts/get_windows_by_pos $window_x $window_y)
+
+
+# Parsing stdout of get_windows_by_pos (json)
+title=$(echo "$WINDOW_INFO" | jq -r '.title')
+class=$(echo "$WINDOW_INFO" | jq -r '.class')
+echo "title = $title, class = $class"
+
+if [[ $class =~ "steam_app" ]]; then
+    SCREENSHOT_PATH+="/Steam"
+    echo "STEAM APP: " "$class"
+    class="$(grep "^$(echo $class | cut -d'_' -f3)=" "$HOME/.config/steam_apps.txt" | cut -d'=' -f2)"
+    echo "END CLASS: " "$class"
+else
+    class=$(get_pretty_name "$class")
+fi
+
+
+
+filename="$(date +"%Y-%m-%d %H:%M:%S") $class.png"
+echo "Name = $SCREENSHOT_PATH/$class/$filename"
+mkdir -p "$SCREENSHOT_PATH/$class"
+
+grim -g "$geometry" - | tee "$SCREENSHOT_PATH/$class/$filename" | wl-copy
+pw-play /usr/share/sounds/freedesktop/stereo/dialog-warning.oga
+
+mkdir -p "$MASSIVE_PATH"
+find $MASSIVE_PATH -xtype l -delete
+ln -s "$SCREENSHOT_PATH/$class/$filename" "$MASSIVE_PATH"
+
+command=$(notify-send "$class $slurp_w""x$slurp_h screenshot taked" "$title, name=$filename" -h string:image-path:"$SCREENSHOT_PATH/$class/$filename" --action="show=Show" --action="open=Open" --action="delete=Delete" --wait="4" --expire-time="10000" --app-name="Screenshot Manager")
+
+case $command in
+    "show")
+        echo "Screenshot opened in file manager"
+        xdg-open "$SCREENSHOT_PATH/$class" 2>/dev/null
+        ;;
+    "open")
+        echo "Screenshot opened"
+        xdg-open "$SCREENSHOT_PATH/$class/$filename" 2>/dev/null
+        ;;
+    "delete")
+        echo "Screenshot deleted"
+        rm "$SCREENSHOT_PATH/Massive/$filename"
+        rm "$SCREENSHOT_PATH/$class/$filename"
+        ;;
+esac

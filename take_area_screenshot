@@ -1,0 +1,3 @@
+#!/bin/bash
+
+$HOME/.local/scripts/take_size_screenshot "$(slurp -d -b \#01010180 -c \#d7bbb5aa)"
