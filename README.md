@@ -2,6 +2,8 @@
 
 A complete screenshot management system for Hyprland with automatic window naming, Steam game detection, and interactive notifications.
 
+<video src="assets/demo.webm" autoplay muted loop playsinline width="100%"></video>
+
 ---
 
 ## Features
