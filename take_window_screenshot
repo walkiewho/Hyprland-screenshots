@@ -1,4 +1,4 @@
 #!/bin/bash
 
 
-$HOME/.local/bin/take_size_screenshot "$(hyprctl clients -j | jq -r --argjson ws "$(hyprctl activeworkspace -j | jq '.id')" '(.[] | select(.workspace.id == $ws) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"),"6,51 1908x1023","0,0 1920x1080"' | slurp -r -d -b \#01010180 -B \#01010180 -c \#d7bbb5aa)"
+$HOME/.local/bin/take_size_screenshot "$(hyprctl clients -j | jq -r --argjson ws "$(hyprctl activeworkspace -j | jq '.id')" '(.[] | select(.workspace.id == $ws) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])")' | slurp -r -d -b \#01010180 -B \#01010180 -c \#d7bbb5aa)"
