@@ -2,17 +2,8 @@
 
 A complete screenshot management system for Hyprland with automatic window naming, Steam game detection, and interactive notifications.
 
-<p align="center">
-  <video src="https://github.com/walkiewho/Hyprland-screenshots/raw/main/assets/usage.webm" 
-         controls 
-         width="800" 
-         height="450" 
-         autoplay 
-         loop 
-         muted>
-    Ваш браузер не поддерживает видео.
-  </video>
-</p>
+
+https://private-user-images.githubusercontent.com/208841911/619112517-8754719d-f048-476a-b9c6-aa12a5f8ce68.webm
 
 ## Features
 - Full screen, area, and active window screenshots
