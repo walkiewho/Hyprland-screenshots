@@ -46,8 +46,7 @@ sudo apt install grim slurp jq wl-clipboard libnotify-bin pipewire xdg-utils
 ```bash
 https://github.com/walkiewho/Hyprland-screenshots
 cd Hyprland-screenshots
-chmod +x setup.sh
-./setup.sh
+bash setup.sh
 ```
 The setup script will:
   - Make all scripts executable
@@ -90,6 +89,13 @@ Example:
   - org.kde.dolphin=Dolphin
   - jetbrains-pycharm-ce=PyCharm
   - Alacritty=Terminal
+
+### Note about PATH
+The scripts are installed to `~/.local/scripts/`. To run them from anywhere, 
+add this to your shell config (.bashrc, .zshrc, etc.):
+```bash
+export PATH="$HOME/.local/scripts:$PATH"
+```
 
 ---
 
