@@ -138,3 +138,14 @@ Options:
 6. Creates symlink in ~/Pictures/Screenshots/Massive/
 7. Clipboard: Copies screenshot to clipboard via wl-copy
 8. Notifications: Interactive notification with actions
+
+# Files Description
+- **get_windows_by_pos**: Get 2 arguments X and Y and return current window from **hyprctl clients** under that position (works properly with multiply workspaces). If no arguments given it takes X and Y of cursor.
+- **take_size_screenshot**: Main script for taking screenshot. Get 4 arguments X and Y of left upper corner and W, H of area (format like in **slurp** `"0, 0 1920x1080"`).
+- **take_area_screenshot**: Take screenshot with given area. Just connect **take_size_screenshot** and **slurp** with arguments.
+- **take_window_screenshot**: Take screenshot of window. Uses **hyprctl clients** to get windows properties and **slurp** to select window.
+- **take_full_screenshot**: Take fullscreen screenshot. Fork of **take_size_screenshot** with same logic but uses less **hyprctl**. Takes active window to name screenshot.
+- **print_help**: Print help information after installation. Also you can run it manualy to get info.
+- **setup.sh**: Setup script. **chmod** scripts and copy them to `~/.local/scripts`.
+- **uninstall.sh**: Uninstall script. Deletes all scripts and other files, created by setup script.
+- **steam_apps.txt**: Contains every game in steam. Format: `app_id=app_name`. Used to give names to screenshots in steam games
