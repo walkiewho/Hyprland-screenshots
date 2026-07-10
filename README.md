@@ -44,7 +44,7 @@ sudo apt install grim slurp jq wl-clipboard libnotify-bin pipewire xdg-utils
 
 ## Installation
 ```bash
-https://github.com/walkiewho/Hyprland-screenshots
+git clone https://github.com/walkiewho/Hyprland-screenshots
 cd Hyprland-screenshots
 bash setup.sh
 ```
